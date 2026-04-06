@@ -8,12 +8,12 @@ function afficherPagePanier() {
 
   games.forEach(game => {
     gameCards.innerHTML += `
-      <div class="card relative bg-[#EDF7BD] rounded-xl p-4 flex flex-col md:flex-col gap-4 shadow-md h-full">
+      <div class="card relative bg-[#EDF7BD] rounded-xl p-4 flex flex-col md:flex-col gap-4 shadow-md h-full ">
 
         <!-- routeur -->
         <a href="index.html" 
            class="absolute top-[10px] left-[10px] text-blue-600 text-lg font-bold">
-           routeur
+           GO HOME
         </a>
 
         <!-- Content -->
