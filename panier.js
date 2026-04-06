@@ -1,92 +1,98 @@
-import { games } from "./data.js";
 
-const gameCards = document.getElementById('Container');
-let cart = JSON.parse(localStorage.getItem('games')) || [];
 
-function afficherPagePanier() {
-  gameCards.innerHTML = ""; // vider avant
+const container = document.getElementById("Container");
 
-  games.forEach(game => {
-    gameCards.innerHTML += `
-      <div class="card relative bg-[#EDF7BD] rounded-xl p-4 flex flex-col md:flex-col gap-4 shadow-md h-full ">
+function afficherPanier() {
+  container.innerHTML = "";
 
-        <!-- routeur -->
-        <a href="index.html" 
-           class="absolute top-[10px] left-[10px] text-blue-600 text-lg font-bold">
-           GO HOME
-        </a>
+  let panier = JSON.parse(localStorage.getItem("panier")) || [];
 
-        <!-- Content -->
-        <div class="flex flex-col gap-4 mt-6">
+  panier.forEach((game) => {
 
-          <div class="flex items-center gap-4 w-full">
-            <img src="${game.image}"
-                 class="w-16 h-16 rounded-lg">
+    const card = document.createElement("div");
+    card.className = "card bg-[#EDF7BD] p-4 rounded-xl mb-4";
 
-            <div class="flex-1">
-              <h2 class="font-semibold">${game.title}</h2>
-              <p class="text-sm text-gray-500">${game.description}/hr</p>
-              <p class="price text-blue-600 font-bold">${'$' + game.price}</p>
-            </div>
-          </div>
+    card.setAttribute("data-id", game.id);
 
-          <!-- Controls -->
-          <div class="flex items-center justify-center gap-3 mt-9">
-            <span class="moins w-16 text-2xl cursor-pointer">-</span>
-            <span class="qnt w-16 text-2xl">1</span>
-            <span class="plus w-16 text-2xl cursor-pointer">+</span>
+    card.innerHTML = `
+      <a href="index.html" class="text-blue-600 font-bold">GO HOME</a>
 
-            <button class="delete bg-red-500 text-white px-3 py-1 rounded">
-              x
-            </button>
-          </div>
-
-          <div class="flex justify-between">
-            <span>Total</span>
-            <span class="total">$ ${game.price}</span>
-          </div>
-
+      <div class="flex gap-4 mt-4">
+        <img src="${game.image}" class="w-16 h-16 rounded">
+        
+        <div>
+          <h2>${game.title}</h2>
+          <p>${game.description}</p>
+          <p class="price text-blue-600">${game.price}</p>
         </div>
-
-        <!-- Button Commander -->
-        <div class="w-full md:w-full md:mt-auto">
-          <button class="commander w-full bg-green-400 rounded-full py-3 text-lg">
-            Commander
-          </button>
-        </div>
-
       </div>
+
+      <div class="flex gap-3 mt-4">
+        <button class="moins">-</button>
+        <span class="qnt">1</span>
+        <button class="plus">+</button>
+        <button class="delete text-red-500">x</button>
+      </div>
+
+      <p class="total mt-2">Total: $${game.price}</p>
+
+      <button class="commander bg-green-400 w-full mt-3 p-2 rounded">
+        Commander
+      </button>
     `;
-  });
 
-  // Gestion des boutons
-  gameCards.addEventListener("click", function(e) {
-    const card = e.target.closest(".card");
-    if (!card) return;
-
-    // + / - pour quantité
-    if (e.target.classList.contains("plus") || e.target.classList.contains("moins")) {
-      const qnt = card.querySelector(".qnt");
-      const total = card.querySelector(".total");
-      const price = parseFloat(card.querySelector(".price").textContent.replace('$',''));
-      let quantity = parseInt(qnt.textContent);
-
-      quantity += e.target.classList.contains("plus") ? 1 : (quantity > 1 ? -1 : 0);
-
-      qnt.textContent = quantity;
-      total.textContent = `$ ${quantity * price}`;
-    }
-
-    // Supprimer la carte
-    if (e.target.classList.contains("delete")) {
-      card.remove();
-    }
-
-    // Commander
-    if (e.target.classList.contains("commander")) {
-      alert("Merci pour votre commande !");
-    }
+    container.appendChild(card);
   });
 }
 
-afficherPagePanier();
+
+container.addEventListener("click", (e) => {
+
+  const card = e.target.closest(".card");
+  if (!card) return;
+
+
+
+  const qnt = card.querySelector(".qnt");
+  const price = Number(card.querySelector(".price").textContent);
+  const total = card.querySelector(".total");
+
+  let quantity = Number(qnt.textContent);
+
+
+  if (e.target.classList.contains("plus")) {
+    quantity++;
+  }
+
+
+  if (e.target.classList.contains("moins") && quantity > 1) {
+    quantity--;
+  }
+
+  // update
+  qnt.textContent = quantity;
+  total.textContent = "Total: $" + (quantity * price);
+
+ 
+  if (e.target.classList.contains("delete")) {
+
+    let panier = JSON.parse(localStorage.getItem("panier")) || [];
+
+    const id = card.getAttribute("data-id");
+
+   
+    panier = panier.filter(game => game.id != id);
+
+    localStorage.setItem("panier", JSON.stringify(panier));
+
+    card.remove();
+  }
+
+  // commander
+  if (e.target.classList.contains("commander")) {
+    alert("Commande validée !");
+  }
+
+});
+
+afficherPanier();
